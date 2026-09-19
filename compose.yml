@@ -16,8 +16,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # Optional: run the app in Docker (`docker compose --profile app up`).
-  # Default workflow is host `bin/dev` + this `db` service.
   app:
     profiles: ["app"]
     build: .
