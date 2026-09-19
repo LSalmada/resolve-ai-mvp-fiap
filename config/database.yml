@@ -1,0 +1,40 @@
+# PostgreSQL. Versions 9.3 and up are supported.
+#
+# Local default: Docker Compose service `db` on localhost:5432
+# (see compose.yml). Override with POSTGRES_* env vars or DATABASE_URL.
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  port: <%= ENV.fetch("POSTGRES_PORT", 5432) %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+
+development:
+  <<: *default
+  database: resolve_ai_mvp_fiap_development
+
+test:
+  <<: *default
+  database: resolve_ai_mvp_fiap_test
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: resolve_ai_mvp_fiap_production
+    username: resolve_ai_mvp_fiap
+    password: <%= ENV["RESOLVE_AI_MVP_FIAP_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: resolve_ai_mvp_fiap_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: resolve_ai_mvp_fiap_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: resolve_ai_mvp_fiap_production_cable
+    migrations_paths: db/cable_migrate

@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16
+    container_name: resolve-ai-mvp-fiap-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "${POSTGRES_PUBLISH_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional: run the app in Docker (`docker compose --profile app up`).
+  # Default workflow is host `bin/dev` + this `db` service.
+  app:
+    profiles: ["app"]
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: postgres://postgres:postgres@db:5432/resolve_ai_mvp_fiap_production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      RESOLVE_AI_MVP_FIAP_DATABASE_PASSWORD: postgres
+    volumes:
+      - app_storage:/rails/storage
+
+volumes:
+  postgres_data:
+  app_storage:
