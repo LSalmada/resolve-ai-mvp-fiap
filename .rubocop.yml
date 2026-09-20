@@ -1,1 +1,9 @@
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  Exclude:
+    - "app/components/ruby_ui/**/*"

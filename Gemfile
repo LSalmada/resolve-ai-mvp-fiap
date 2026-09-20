@@ -18,6 +18,12 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+# Auth and authorization
+gem "devise", "~> 4.9"
+gem "pundit", "~> 2.5"
+# Phlex views and RubyUI component primitives
+gem "phlex-rails", "~> 2.4"
+gem "tailwind_merge", "~> 1.5"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
@@ -56,6 +62,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  # Generators for Phlex + Tailwind UI components
+  gem "ruby_ui", "~> 1.6", require: false
 end
 
 group :test do

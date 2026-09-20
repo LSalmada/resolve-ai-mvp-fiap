@@ -31,8 +31,9 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
+  # Don't care if the mailer can't send. Store recover-password emails on disk in development.
   config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.delivery_method = :file
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
