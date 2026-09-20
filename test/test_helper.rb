@@ -4,12 +4,34 @@ require "rails/test_help"
 
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
 
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-    fixtures :all
+    def create_user(role: :requester, **attrs)
+      suffix = SecureRandom.hex(4)
+      User.create!(
+        name: attrs[:name] || "User #{role.to_s.titleize}",
+        email: attrs[:email] || "#{role}-#{suffix}@resolve.ai",
+        password: attrs[:password] || "password123",
+        password_confirmation: attrs[:password] || "password123",
+        role: role
+      )
+    end
 
-    # Add more helper methods to be used by all tests here...
+    def build_occurrence(reporter:, **attrs)
+      Occurrence.new(
+        {
+          reporter: reporter,
+          title: "Test occurrence",
+          description: "Test occurrence description.",
+          location: "Block B, 3rd floor",
+          category: :lighting,
+          priority: :medium
+        }.merge(attrs)
+      )
+    end
+
+    def create_occurrence(reporter:, **attrs)
+      build_occurrence(reporter: reporter, **attrs).tap(&:save!)
+    end
   end
 end

@@ -36,6 +36,16 @@ class ApplicationPolicy
     false
   end
 
+  private
+
+  def manager?
+    user&.manager?
+  end
+
+  def requester?
+    user&.requester?
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

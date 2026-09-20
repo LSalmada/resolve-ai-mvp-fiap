@@ -21,6 +21,8 @@ gem "jbuilder"
 # Auth and authorization
 gem "devise", "~> 4.9"
 gem "pundit", "~> 2.5"
+# json 3.x dropped `quirks_mode`, which Active Support 8.0 still passes.
+gem "json", "~> 2.13"
 # Phlex views and RubyUI component primitives
 gem "phlex-rails", "~> 2.4"
 gem "tailwind_merge", "~> 1.5"

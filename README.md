@@ -24,10 +24,12 @@ POSTGRES_PORT=5433 bin/dev
 
 The production-oriented `Dockerfile` is included; the app itself is meant to run on the host during development. To try the containerized app: `docker compose --profile app up`.
 
-local:
+After `bin/setup` (or `bin/rails db:seed`), demo users are:
 
-```bash
-docker compose up -d db
-POSTGRES_PORT=5433 bin/setup --skip-server
-POSTGRES_PORT=5433 bin/dev
-```
+| Perfil    | E-mail               | Senha       |
+| --------- | -------------------- | ----------- |
+| Manager   | manager@resolve.ai   | password123 |
+| Requester | requester@resolve.ai | password123 |
+| Requester | marina@resolve.ai    | password123 |
+
+Public sign-up always creates a `requester`. Managers are seeded (or created in the console).

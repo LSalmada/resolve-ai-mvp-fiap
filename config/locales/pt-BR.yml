@@ -1,0 +1,35 @@
+pt-BR:
+  activerecord:
+    models:
+      user: Usuário
+      occurrence: Ocorrência
+      comment: Comentário
+      occurrence_event: Histórico
+    attributes:
+      user:
+        name: Nome
+        email: E-mail
+        password: Senha
+        password_confirmation: Confirmação de senha
+        role: Perfil
+      occurrence:
+        title: Título
+        description: Descrição
+        location: Localização
+        category: Categoria
+        status: Status
+        priority: Prioridade
+        reporter: Solicitante
+        assignee: Responsável
+        resolution_notes: Solução aplicada
+        rating: Avaliação
+        rating_comment: Comentário da avaliação
+        photo: Foto
+      comment:
+        body: Comentário
+      occurrence_event:
+        event_type: Tipo
+        note: Observação
+  errors:
+    messages:
+      blank: não pode ficar em branco

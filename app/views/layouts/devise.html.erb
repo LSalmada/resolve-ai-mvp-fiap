@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title>Resolve Aí</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-svh bg-background text-foreground antialiased">
+    <main class="mx-auto flex min-h-svh max-w-md flex-col justify-center gap-4 p-6">
+      <h1 class="text-center text-xl font-semibold">Resolve Aí</h1>
+      <% if notice.present? %>
+        <p class="rounded-md border border-border bg-card px-3 py-2 text-sm"><%= notice %></p>
+      <% end %>
+      <% if alert.present? %>
+        <p class="rounded-md border border-destructive/40 bg-card px-3 py-2 text-sm text-destructive"><%= alert %></p>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
