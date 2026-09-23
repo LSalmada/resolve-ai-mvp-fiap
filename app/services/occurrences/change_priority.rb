@@ -23,7 +23,11 @@ module Occurrences
         @occurrence.record_event!(
           event_type: :priority_changed,
           user: @actor,
-          note: "Prioridade de #{from_priority} para #{@priority}"
+          note: I18n.t(
+            "occurrences.events.priority_changed_note",
+            from: I18n.t("occurrences.priorities.#{from_priority}"),
+            to: I18n.t("occurrences.priorities.#{@priority}")
+          )
         )
       end
 

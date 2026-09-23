@@ -31,6 +31,7 @@ pt-BR:
       status_changed: Status alterado
       assignee_changed: Responsável atribuído
       priority_changed: Prioridade alterada
+      priority_changed_note: "Prioridade de %{from} para %{to}"
   activerecord:
     models:
       user: Usuário

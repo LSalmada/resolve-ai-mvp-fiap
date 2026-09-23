@@ -226,7 +226,7 @@ class Views::Occurrences::Show < Views::Base
                     "#{occurrence_status_label(event.from_status)} → #{occurrence_status_label(event.to_status)}"
                   end
                 end
-                p { event.note } if event.note.present?
+                p { occurrence_event_note(event) } if event.note.present?
                 p(class: "text-xs text-muted-foreground") { "#{event.user.name} · #{l(event.created_at, format: :short)}" }
               end
             end
