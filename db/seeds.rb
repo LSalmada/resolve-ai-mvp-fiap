@@ -31,7 +31,15 @@ end
 def prioritize!(occurrence, actor:, priority:, note: nil)
   from = occurrence.priority
   occurrence.update!(priority: priority)
-  occurrence.record_event!(event_type: :priority_changed, user: actor, note: note || "Prioridade de #{from} para #{priority}")
+  occurrence.record_event!(
+    event_type: :priority_changed,
+    user: actor,
+    note: note || I18n.t(
+      "occurrences.events.priority_changed_note",
+      from: I18n.t("occurrences.priorities.#{from}"),
+      to: I18n.t("occurrences.priorities.#{priority}")
+    )
+  )
 end
 
 lampada = Occurrence.create!(
