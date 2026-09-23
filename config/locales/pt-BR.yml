@@ -1,4 +1,36 @@
 pt-BR:
+  time:
+    formats:
+      short: "%d/%m/%Y %H:%M"
+      long: "%d de %B de %Y, %H:%M"
+  date:
+    formats:
+      short: "%d/%m/%Y"
+  occurrences:
+    statuses:
+      open: Aberta
+      in_analysis: Em análise
+      in_progress: Em atendimento
+      resolved: Resolvida
+      cancel: Cancelada
+    categories:
+      lighting: Iluminação
+      equipment: Equipamento
+      accessibility: Acessibilidade
+      cleaning: Limpeza
+      leakage: Vazamento
+      security: Segurança
+      maintenance: Manutenção
+      other: Outros
+    priorities:
+      low: Baixa
+      medium: Média
+      high: Alta
+      urgent: Urgente
+    events:
+      status_changed: Status alterado
+      assignee_changed: Responsável atribuído
+      priority_changed: Prioridade alterada
   activerecord:
     models:
       user: Usuário

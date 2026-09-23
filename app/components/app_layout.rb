@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class Components::AppLayout < Components::Base
-  include Phlex::Rails::Helpers::Flash
   include Phlex::Rails::Helpers::Request
+  include Phlex::Rails::Helpers::FormWith
 
-  def initialize(title: nil, user_name: nil)
+  def initialize(title: nil, user: nil)
     @title = title
-    @user_name = user_name
+    @user = user
   end
 
   def view_template(&)
@@ -15,7 +15,7 @@ class Components::AppLayout < Components::Base
       SidebarInset do
         render_header
         div(class: "flex flex-1 flex-col gap-4 p-4 pt-0") do
-          render_flashes
+          render Components::FlashAlerts.new
           yield
         end
       end
@@ -57,7 +57,12 @@ class Components::AppLayout < Components::Base
           Avatar(size: :sm) do
             AvatarFallback { initials }
           end
-          span(class: "truncate text-sm group-data-[collapsible=icon]:hidden") { @user_name.presence || "Conta" }
+          span(class: "truncate text-sm group-data-[collapsible=icon]:hidden") { user_name }
+        end
+        if @user
+          form_with url: destroy_user_session_path, method: :delete, class: "px-2 pb-2 group-data-[collapsible=icon]:hidden" do
+            Button(type: :submit, variant: :ghost, size: :sm, class: "w-full justify-start") { "Sair" }
+          end
         end
       end
     end
@@ -68,54 +73,40 @@ class Components::AppLayout < Components::Base
       SidebarTrigger()
       Separator(orientation: :vertical, class: "mr-2 h-4")
       h1(class: "flex-1 truncate text-sm font-semibold") { page_title }
-      Badge(variant: :outline) { "MVP" }
-    end
-  end
-
-  def render_flashes
-    flash.each do |type, message|
-      next if message.blank?
-
-      Alert(variant: flash_variant(type), class: "mb-2") do
-        AlertTitle { flash_title(type) }
-        AlertDescription { message }
-      end
+      render Components::ThemeModeButton.new
+      Badge(variant: :outline) { role_label }
     end
   end
 
   def nav_items
     path = request.path
-    [
-      { label: "Ocorrências", href: "/occurrences", active: path.start_with?("/occurrences") },
-      { label: "Dashboard", href: "/dashboard", active: path.start_with?("/dashboard") }
+    items = [
+      { label: "Ocorrências", href: occurrences_path, active: path.start_with?("/occurrences") }
     ]
+    if @user&.manager?
+      items << { label: "Dashboard", href: dashboard_path, active: path.start_with?("/dashboard") }
+    end
+    items
   end
 
   def page_title
     @title.presence || "Resolve Aí"
   end
 
+  def user_name
+    @user&.display_name.presence || "Conta"
+  end
+
   def initials
-    name = @user_name.to_s.strip
-    return "RA" if name.empty?
+    name = user_name.to_s.strip
+    return "RA" if name.empty? || name == "Conta"
 
     name.split.map { |part| part[0] }.first(2).join.upcase
   end
 
-  def flash_variant(type)
-    case type.to_s
-    when "notice", "success" then :success
-    when "alert", "error" then :destructive
-    when "warning" then :warning
-    end
-  end
+  def role_label
+    return "MVP" unless @user
 
-  def flash_title(type)
-    case type.to_s
-    when "notice", "success" then "Sucesso"
-    when "alert", "error" then "Atenção"
-    when "warning" then "Aviso"
-    else "Mensagem"
-    end
+    @user.manager? ? "Gestor" : "Solicitante"
   end
 end
