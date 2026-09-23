@@ -1,12 +1,30 @@
 Rails.application.routes.draw do
-  devise_for :users, controllers: { registrations: "users/registrations" }
+  devise_for :users, controllers: {
+    registrations: "users/registrations",
+    sessions: "users/sessions"
+  }
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Placeholder until HTML occurrence screens land.
-  devise_scope :user do
-    root "devise/sessions#new"
+  authenticated :user do
+    root "occurrences#index", as: :authenticated_root
   end
+
+  devise_scope :user do
+    unauthenticated do
+      root "users/sessions#new"
+    end
+  end
+
+  resources :occurrences, only: %i[index show new create] do
+    resources :comments, only: :create
+    resource :rating, only: :create
+    member do
+      patch :transition
+      patch :assign
+      patch :prioritize
+    end
+  end
+
+  get "dashboard", to: "dashboard#show", as: :dashboard
 end

@@ -7,6 +7,7 @@ class RubyUiTest < ActiveSupport::TestCase
     %i[
       Button Card Table Badge Form Dialog DropdownMenu Tabs Alert
       Avatar Select Sidebar Textarea Input Sheet Separator Skeleton
+      Toggle ThemeToggle
     ].each do |name|
       assert RubyUI.const_defined?(name), "expected RubyUI::#{name}"
     end

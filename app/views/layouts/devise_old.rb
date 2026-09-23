@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Views::Layouts::Application < Views::Base
+class Views::Layouts::Devise < Views::Base
   include Phlex::Rails::Layout
   include Phlex::Rails::Helpers::ContentFor
 
@@ -25,10 +25,14 @@ class Views::Layouts::Application < Views::Base
       end
 
       body(class: "min-h-svh bg-background text-foreground antialiased") do
-        render Components::AppLayout.new(
-          title: page_heading,
-          user: current_user
-        ), &
+        main(class: "mx-auto flex min-h-svh max-w-md flex-col justify-center gap-4 p-6") do
+          div(class: "flex items-center justify-center gap-2") do
+            h1(class: "text-xl font-semibold") { "Resolve Aí" }
+            render Components::ThemeModeButton.new
+          end
+          render Components::FlashAlerts.new
+          yield
+        end
       end
     end
   end
