@@ -27,4 +27,18 @@ Rails.application.routes.draw do
   end
 
   get "dashboard", to: "dashboard#show", as: :dashboard
+
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      post "sessions", to: "authentication#create"
+      delete "sessions", to: "authentication#destroy"
+
+      resources :occurrences, only: %i[index show create update] do
+        resources :comments, only: :create
+        resource :rating, only: :create
+      end
+
+      get "dashboard", to: "dashboard#show"
+    end
+  end
 end
