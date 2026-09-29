@@ -19,7 +19,7 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 # Auth and authorization
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 gem "pundit", "~> 2.5"
 # json 3.x dropped `quirks_mode`, which Active Support 8.0 still passes.
 gem "json", "~> 2.13"
