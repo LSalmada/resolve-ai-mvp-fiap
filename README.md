@@ -1,6 +1,6 @@
 # Resolve Aí
 
-MVP Rails 8 (PostgreSQL, Tailwind, importmap, Stimulus) for POSTECH FSDT Fase 5 — gestão de ocorrências de condomínio.
+MVP em Rails 8 (PostgreSQL, Tailwind, importmap e Stimulus) para a POSTECH FSDT Fase 5 — gestão de ocorrências de condomínio.
 
 Diagramas e detalhe de domínio:
 
@@ -10,17 +10,17 @@ Diagramas e detalhe de domínio:
 
 ```mermaid
 flowchart LR
-  Browser[Browser HTML] --> Rails
+  Navegador[Navegador HTML] --> Rails
   API[Cliente JSON] --> Rails
   Rails[Rails 8 + Devise + Pundit] --> PG[(Postgres Docker)]
-  Rails --> Disk[Active Storage disco]
+  Rails --> Disco[Active Storage disco]
 ```
 
-Cadastro público cria **solicitante** (`requester`). Gestores (`manager`) vêm do seed. O HTML e a API compartilham o mesmo domínio e as mesmas policies.
+O cadastro público cria um **solicitante** (`requester`). Os gestores (`manager`) vêm do seed. O HTML e a API compartilham o mesmo domínio e as mesmas policies.
 
-## Local setup
+## Configuração local
 
-Ruby 3.3.7, Docker, and Bundler.
+Ruby 3.3.7, Docker e Bundler.
 
 ```bash
 docker compose up -d db
@@ -28,9 +28,9 @@ bin/setup --skip-server
 bin/dev
 ```
 
-`bin/setup` installs gems and prepares the database. `bin/dev` runs Puma + Tailwind.
+O `bin/setup` instala as gems e prepara o banco. O `bin/dev` sobe o Puma e o Tailwind.
 
-Postgres runs in Compose (`postgres:16`) on **localhost:5432** (`postgres` / `postgres`). If that port is already taken:
+O Postgres roda no Compose (`postgres:16`) em **localhost:5432** (`postgres` / `postgres`). Se essa porta já estiver em uso:
 
 ```bash
 POSTGRES_PUBLISH_PORT=5433 docker compose up -d db
@@ -38,19 +38,19 @@ POSTGRES_PORT=5433 bin/setup --skip-server
 POSTGRES_PORT=5433 bin/dev
 ```
 
-The production-oriented `Dockerfile` is included; the app itself is meant to run on the host during development. To try the containerized app: `docker compose --profile app up`.
+O `Dockerfile` voltado para produção está incluído; em desenvolvimento a aplicação roda no host. Para testar a aplicação em container: `docker compose --profile app up`.
 
-After `bin/setup` (or `bin/rails db:seed`), demo users are:
+Depois do `bin/setup` (ou `bin/rails db:seed`), os usuários de demonstração são:
 
-| Perfil    | E-mail               | Senha       |
-| --------- | -------------------- | ----------- |
-| Manager   | manager@resolve.ai   | password123 |
-| Requester | requester@resolve.ai | password123 |
-| Requester | marina@resolve.ai    | password123 |
+| Perfil       | E-mail               | Senha       |
+| ------------ | -------------------- | ----------- |
+| Gestor       | manager@resolve.ai   | password123 |
+| Solicitante  | requester@resolve.ai | password123 |
+| Solicitante  | marina@resolve.ai    | password123 |
 
-Public sign-up always creates a `requester`. Managers are seeded (or created in the console).
+O cadastro público sempre cria um `requester`. Gestores vêm do seed (ou são criados no console).
 
-Seeds cobrem os 5 status e várias categorias (iluminação, equipamento, vazamento, acessibilidade, limpeza, segurança, manutenção, outros).
+Os seeds cobrem os 5 status e várias categorias (iluminação, equipamento, vazamento, acessibilidade, limpeza, segurança, manutenção, outros).
 
 ## Testes
 
@@ -60,44 +60,44 @@ bundle exec rspec
 
 ## API v1
 
-JSON API on the same Rails app. Auth is a Devise **session cookie** (no JWT). CSRF is skipped on `/api/*`; send `Cookie` after login (curl: `-c` / `-b`).
+API JSON na mesma aplicação Rails. A autenticação usa o **cookie de sessão** do Devise (sem JWT). O CSRF é ignorado em `/api/*`; envie o `Cookie` depois do login (no curl: `-c` / `-b`).
 
-Base URL: `http://localhost:3000/api/v1`. Send `Accept: application/json`. Enum values match the models: statuses `open`, `in_analysis`, `in_progress`, `resolved`, `cancel`; roles `requester` / `manager`; categories `lighting`, `equipment`, `accessibility`, `cleaning`, `leakage`, `security`, `maintenance`, `other`; priorities `low`, `medium`, `high`, `urgent`.
+URL base: `http://localhost:3000/api/v1`. Envie `Accept: application/json`. Os valores dos enums coincidem com os modelos: status `open`, `in_analysis`, `in_progress`, `resolved`, `cancel`; papéis `requester` / `manager`; categorias `lighting`, `equipment`, `accessibility`, `cleaning`, `leakage`, `security`, `maintenance`, `other`; prioridades `low`, `medium`, `high`, `urgent`.
 
-| Method | Path | Who | What |
-| ------ | ---- | --- | ---- |
-| `POST` | `/api/v1/sessions` | Public | Sign in (`email`, `password`) |
-| `DELETE` | `/api/v1/sessions` | Signed in | Sign out |
-| `GET` | `/api/v1/occurrences` | Both | List (`status`, `category`, `priority` filters). Requester: own rows only |
-| `POST` | `/api/v1/occurrences` | Requester | Create (`title`, `description`, `location`, `category`, optional `photo`) |
-| `GET` | `/api/v1/occurrences/:id` | Owner or manager | Detail with `comments`, `events`, `photo_url` |
-| `PATCH` | `/api/v1/occurrences/:id` | Manager | `priority`, `assignee_id`, `status` + required `note`, `resolution_notes` when resolving |
-| `POST` | `/api/v1/occurrences/:id/comments` | Owner or manager | `{ "comment": { "body": "..." } }` |
-| `POST` | `/api/v1/occurrences/:id/rating` | Owner, if `resolved` | `{ "rating": 1-5, "rating_comment": "..." }` |
-| `GET` | `/api/v1/dashboard` | Manager | Totals by status/category, open vs resolved, average resolution hours |
+| Método   | Caminho                              | Quem                    | O que                                                                                          |
+| -------- | ------------------------------------ | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `POST`   | `/api/v1/sessions`                   | Público                 | Entrar (`email`, `password`)                                                                   |
+| `DELETE` | `/api/v1/sessions`                   | Autenticado             | Sair                                                                                           |
+| `GET`    | `/api/v1/occurrences`                | Ambos                   | Listar (filtros `status`, `category`, `priority`). Solicitante: apenas as próprias ocorrências |
+| `POST`   | `/api/v1/occurrences`                | Solicitante             | Criar (`title`, `description`, `location`, `category`, `photo` opcional)                      |
+| `GET`    | `/api/v1/occurrences/:id`            | Dono ou gestor          | Detalhe com `comments`, `events`, `photo_url`                                                  |
+| `PATCH`  | `/api/v1/occurrences/:id`            | Gestor                  | `priority`, `assignee_id`, `status` + `note` obrigatória, `resolution_notes` ao resolver       |
+| `POST`   | `/api/v1/occurrences/:id/comments`   | Dono ou gestor          | `{ "comment": { "body": "..." } }`                                                            |
+| `POST`   | `/api/v1/occurrences/:id/rating`     | Dono, se `resolved`     | `{ "rating": 1-5, "rating_comment": "..." }`                                                   |
+| `GET`    | `/api/v1/dashboard`                  | Gestor                  | Totais por status/categoria, abertas vs resolvidas, média de horas até a resolução            |
 
-HTML Devise (`POST /users/sign_in`) also sets the same cookie if you prefer the browser form.
+O Devise em HTML (`POST /users/sign_in`) também define o mesmo cookie, se preferir o formulário do navegador.
 
-### curl examples
+### Exemplos com curl
 
 ```bash
-# Sign in (stores session cookie)
+# Entrar (grava o cookie de sessão)
 curl -sS -c /tmp/resolve-ai-cookies -b /tmp/resolve-ai-cookies \
   -H 'Content-Type: application/json' -H 'Accept: application/json' \
   -d '{"email":"requester@resolve.ai","password":"password123"}' \
   http://localhost:3000/api/v1/sessions
 
-# List my occurrences
+# Listar minhas ocorrências
 curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   http://localhost:3000/api/v1/occurrences
 
-# Create (JSON, no photo)
+# Criar (JSON, sem foto)
 curl -sS -b /tmp/resolve-ai-cookies \
   -H 'Content-Type: application/json' -H 'Accept: application/json' \
   -d '{"occurrence":{"title":"Lâmpada queimada","description":"Corredor escuro.","location":"Bloco B, 3º andar","category":"lighting"}}' \
   http://localhost:3000/api/v1/occurrences
 
-# Create with photo (multipart)
+# Criar com foto (multipart)
 curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   -F 'occurrence[title]=Vazamento no hall' \
   -F 'occurrence[description]=Poça perto do elevador.' \
@@ -106,12 +106,12 @@ curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   -F 'occurrence[photo]=@photo.png;type=image/png' \
   http://localhost:3000/api/v1/occurrences
 
-# Detail
+# Detalhe
 curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   http://localhost:3000/api/v1/occurrences/1
 ```
 
-Manager flow (sign in as `manager@resolve.ai`):
+Fluxo do gestor (entrar como `manager@resolve.ai`):
 
 ```bash
 curl -sS -c /tmp/resolve-ai-cookies -b /tmp/resolve-ai-cookies \
@@ -119,11 +119,11 @@ curl -sS -c /tmp/resolve-ai-cookies -b /tmp/resolve-ai-cookies \
   -d '{"email":"manager@resolve.ai","password":"password123"}' \
   http://localhost:3000/api/v1/sessions
 
-# Inbox filter
+# Filtro da caixa de entrada
 curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   'http://localhost:3000/api/v1/occurrences?status=open&priority=high'
 
-# Priority, assignee, then status (note is required)
+# Prioridade, responsável e depois status (a observação é obrigatória)
 curl -sS -b /tmp/resolve-ai-cookies -H 'Content-Type: application/json' -H 'Accept: application/json' \
   -d '{"occurrence":{"priority":"high"}}' \
   -X PATCH http://localhost:3000/api/v1/occurrences/1
@@ -136,17 +136,17 @@ curl -sS -b /tmp/resolve-ai-cookies -H 'Content-Type: application/json' -H 'Acce
   -d '{"occurrence":{"status":"in_analysis","note":"Vistoria agendada."}}' \
   -X PATCH http://localhost:3000/api/v1/occurrences/1
 
-# Resolve
+# Resolver
 curl -sS -b /tmp/resolve-ai-cookies -H 'Content-Type: application/json' -H 'Accept: application/json' \
   -d '{"occurrence":{"status":"resolved","note":"Concluído","resolution_notes":"Lâmpada substituída."}}' \
   -X PATCH http://localhost:3000/api/v1/occurrences/1
 
-# Dashboard
+# Painel
 curl -sS -b /tmp/resolve-ai-cookies -H 'Accept: application/json' \
   http://localhost:3000/api/v1/dashboard
 ```
 
-Comment and rating (requester, after the occurrence is `resolved`):
+Comentário e avaliação (solicitante, depois que a ocorrência estiver `resolved`):
 
 ```bash
 curl -sS -b /tmp/resolve-ai-cookies -H 'Content-Type: application/json' -H 'Accept: application/json' \
@@ -158,7 +158,7 @@ curl -sS -b /tmp/resolve-ai-cookies -H 'Content-Type: application/json' -H 'Acce
   http://localhost:3000/api/v1/occurrences/1/rating
 ```
 
-Sign out:
+Sair:
 
 ```bash
 curl -sS -b /tmp/resolve-ai-cookies -c /tmp/resolve-ai-cookies -X DELETE \
@@ -166,8 +166,8 @@ curl -sS -b /tmp/resolve-ai-cookies -c /tmp/resolve-ai-cookies -X DELETE \
   http://localhost:3000/api/v1/sessions
 ```
 
-One manager `PATCH` can set `priority`, `assignee_id`, and `status` together. Changing status requires `note`. If any step fails, the whole update is rolled back. Allowed moves: `open → in_analysis → in_progress → resolved`, or `cancel` from `open`, `in_analysis`, or `in_progress`.
+Um único `PATCH` do gestor pode definir `priority`, `assignee_id` e `status` juntos. Mudar o status exige `note`. Se algum passo falhar, a atualização inteira é revertida. Movimentos permitidos: `open → in_analysis → in_progress → resolved`, ou `cancel` a partir de `open`, `in_analysis` ou `in_progress`.
 
-`GET /api/v1/dashboard` returns `total`, `open_count`, `resolved_count`, `average_resolution_hours`, `status_counts`, and `category_counts`. `GET /api/v1/occurrences/:id` adds `comments`, `events`, and `photo_url`.
+`GET /api/v1/dashboard` devolve `total`, `open_count`, `resolved_count`, `average_resolution_hours`, `status_counts` e `category_counts`. `GET /api/v1/occurrences/:id` inclui `comments`, `events` e `photo_url`.
 
-Errors return `{ "error": "..." }` with `401` (unauthenticated), `403` (forbidden), `404` (not in scope), or `422` (validation / invalid transition). Validation payloads may also include `"errors": []`.
+Erros devolvem `{ "error": "..." }` com `401` (não autenticado), `403` (proibido), `404` (fora do escopo) ou `422` (validação / transição inválida). Respostas de validação também podem incluir `"errors": []`.
