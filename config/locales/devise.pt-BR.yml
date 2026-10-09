@@ -1,0 +1,22 @@
+pt-BR:
+  devise:
+    failure:
+      already_authenticated: "Você já está conectado."
+      inactive: "Sua conta ainda não foi ativada."
+      invalid: "%{authentication_keys} ou senha inválidos."
+      locked: "Sua conta está bloqueada."
+      last_attempt: "Você tem mais uma tentativa antes de sua conta ser bloqueada."
+      not_found_in_database: "%{authentication_keys} ou senha inválidos."
+      timeout: "Sua sessão expirou. Entre novamente para continuar."
+      unauthenticated: "Entre ou crie uma conta para continuar."
+    registrations:
+      destroyed: "Sua conta foi cancelada."
+      signed_up: "Bem-vindo! Sua conta foi criada com sucesso."
+      signed_up_but_inactive: "Conta criada, mas ainda não foi ativada."
+      signed_up_but_locked: "Conta criada, mas está bloqueada."
+      updated: "Sua conta foi atualizada com sucesso."
+      updated_but_not_signed_in: "Sua conta foi atualizada. Como a senha mudou, entre novamente."
+    sessions:
+      signed_in: "Login efetuado com sucesso."
+      signed_out: "Você saiu da sua conta."
+      already_signed_out: "Você saiu da sua conta."

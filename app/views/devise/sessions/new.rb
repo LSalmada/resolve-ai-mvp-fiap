@@ -61,6 +61,11 @@ class Views::Devise::Sessions::New < Views::Base
         end
 
         Button(type: :submit, class: "w-full") { "Entrar" }
+
+        p(class: "text-center text-sm text-muted-foreground") do
+          plain "Não tem conta? "
+          a(href: new_user_registration_path, class: "font-medium text-foreground underline-offset-4 hover:underline") { "Criar conta" }
+        end
       end
     end
   end
