@@ -467,7 +467,28 @@ São 88 testes RSpec + FactoryBot, organizados em:
 | `spec/requests` | Fluxos HTML (login, cadastro, ocorrências, dashboard) e API JSON (autenticação, escopo, `PATCH` do gestor, erros) |
 | `spec/components` | Componentes de interface (layout, toasts, tema) |
 
-O workflow `.github/workflows/ci.yml` roda os testes, o lint (RuboCop), a análise de segurança (Brakeman) e a auditoria das dependências JavaScript (`importmap audit`). Os mesmos comandos funcionam localmente:
+### CI/CD
+
+São dois workflows. O `.github/workflows/ci.yml` (CI) roda em todo pull request e em todo push na `main`. O `.github/workflows/deploy.yml` (CD) roda quando o CI termina:
+
+```mermaid
+flowchart LR
+  pr[Pull request ou push na main] --> lint[RuboCop]
+  pr --> brakeman[Brakeman]
+  pr --> audit[importmap audit]
+  pr --> rspec["RSpec + PostgreSQL 16"]
+  lint --> gate{Push na main e tudo verde?}
+  brakeman --> gate
+  audit --> gate
+  rspec --> gate
+  gate -->|sim| deploy["flyctl deploy + checagem de /up"]
+```
+
+- **CI:** testes, lint, análise de segurança (Brakeman) e auditoria das dependências JavaScript. Um pull request só deve ser mergeado com tudo verde.
+- **CD:** quando o CI de um push na `main` termina com sucesso, o workflow de CD publica no Fly.io exatamente o commit testado (`flyctl deploy --remote-only`). Depois ele confere se `/up` responde 200. Deploys nunca rodam em paralelo, e uma falha de CI bloqueia o deploy.
+- **Segredo:** o deploy usa o secret `FLY_API_TOKEN` do repositório, gerado com `fly tokens create deploy -a resolve-ai-mvp-fiap`.
+
+Os mesmos comandos do CI funcionam localmente:
 
 ```bash
 bin/rubocop
@@ -490,6 +511,7 @@ flowchart LR
 - O `fly.toml` usa o mesmo `Dockerfile` de produção. O app escuta na porta 8080, o health check é `/up`, e o HTTPS é forçado.
 - As fotos ficam no volume `storage`, montado em `/rails/storage`.
 - O primeiro deploy cria os quatro bancos e carrega o seed automaticamente.
+- Os deploys são automáticos a cada merge na `main` (ver [CI/CD](#cicd)). Para um deploy manual: `fly deploy --ha=false`.
 
 ## 13. Estrutura do projeto
 
