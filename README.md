@@ -48,7 +48,7 @@ After `bin/setup` (or `bin/rails db:seed`), demo users are:
 | Requester | requester@resolve.ai | password123 |
 | Requester | marina@resolve.ai    | password123 |
 
-Public sign-up always creates a `requester`. Managers are seeded (or created in the console).
+Public sign-up at `/users/sign_up` (linked from the sign-in page as "Criar conta") always creates a `requester` and signs them in. Managers are seeded (or created in the console).
 
 Seeds cobrem os 5 status e várias categorias (iluminação, equipamento, vazamento, acessibilidade, limpeza, segurança, manutenção, outros).
 
@@ -56,6 +56,34 @@ Seeds cobrem os 5 status e várias categorias (iluminação, equipamento, vazame
 
 ```bash
 bundle exec rspec
+```
+
+## Deploy (Fly.io)
+
+`fly.toml` runs the production `Dockerfile` as app `resolve-ai-mvp-fiap` in `gru`: Thruster on port 8080, Solid Queue inside Puma, uploads on a Fly volume mounted at `/rails/storage`. The entrypoint runs `db:prepare` on boot, so the first deploy creates the four databases (primary, cache, queue, cable) and loads the seeds.
+
+One-time setup (unmanaged Fly Postgres, superuser so `db:prepare` can create the databases):
+
+```bash
+fly apps create resolve-ai-mvp-fiap
+fly postgres create --name resolve-ai-mvp-fiap-db --region gru \
+  --initial-cluster-size 1 --vm-size shared-cpu-1x --volume-size 1
+
+PG="postgres://postgres:<password>@resolve-ai-mvp-fiap-db.flycast:5432"
+fly secrets set --stage -a resolve-ai-mvp-fiap \
+  SECRET_KEY_BASE=$(openssl rand -hex 64) \
+  DATABASE_URL="$PG/resolve_ai_mvp_fiap_production" \
+  CACHE_DATABASE_URL="$PG/resolve_ai_mvp_fiap_production_cache" \
+  QUEUE_DATABASE_URL="$PG/resolve_ai_mvp_fiap_production_queue" \
+  CABLE_DATABASE_URL="$PG/resolve_ai_mvp_fiap_production_cable"
+
+fly volumes create storage --region gru --size 1 -a resolve-ai-mvp-fiap -y
+```
+
+Deploy (single machine, since the volume is attached to one):
+
+```bash
+fly deploy --ha=false
 ```
 
 ## API v1

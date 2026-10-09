@@ -1,4 +1,9 @@
 pt-BR:
+  support:
+    array:
+      words_connector: ", "
+      two_words_connector: " e "
+      last_word_connector: " e "
   time:
     formats:
       short: "%d/%m/%Y %H:%M"
@@ -63,6 +68,43 @@ pt-BR:
       occurrence_event:
         event_type: Tipo
         note: Observação
+        to_status: Novo status
+    errors:
+      models:
+        occurrence:
+          attributes:
+            reporter:
+              must_be_requester: deve ser um solicitante
+            assignee:
+              must_be_manager: deve ser um gestor
+            status:
+              must_start_open: deve começar como Aberta
+              invalid_transition: não pode mudar de %{from} para %{to}
+            rating:
+              out_of_range: deve ser um número inteiro de 1 a 5
+              only_when_resolved: só pode ser enviada quando a ocorrência estiver resolvida
+            resolution_notes:
+              required_when_resolving: é obrigatória ao marcar como resolvida
+            photo:
+              invalid_content_type: deve ser JPEG, PNG ou WebP
+              too_large: é grande demais (máximo de 5 MB)
+        occurrence_event:
+          attributes:
+            to_status:
+              status_payload_required: e status anterior são obrigatórios na mudança de status
   errors:
     messages:
       blank: não pode ficar em branco
+      required: é obrigatório
+      inclusion: não é um valor válido
+      not_a_number: não é um número
+      not_an_integer: deve ser um número inteiro
+      taken: já está em uso
+      invalid: não é válido
+      confirmation: não confere com %{attribute}
+      too_short:
+        one: "é muito curto (mínimo: 1 caractere)"
+        other: "é muito curto (mínimo: %{count} caracteres)"
+      too_long:
+        one: "é muito longo (máximo: 1 caractere)"
+        other: "é muito longo (máximo: %{count} caracteres)"

@@ -85,7 +85,7 @@ flowchart TB
 
 | Papel no código | Perfil | Como nasce |
 | --------------- | ------ | ---------- |
-| `requester` | Solicitante | Cadastro público (`POST /users/sign_up`) sempre força esse papel |
+| `requester` | Solicitante | Cadastro público (tela `GET /users/sign_up`, envio `POST /users`) sempre força esse papel |
 | `manager` | Gestor | Seed (`manager@resolve.ai`) ou console |
 
 ## Enums (código / enunciado)

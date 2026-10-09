@@ -3,6 +3,13 @@
 require "rails_helper"
 
 RSpec.describe "Sessions", type: :request do
+  it "links the sign in page to sign up" do
+    get new_user_session_path
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include(%(href="#{new_user_registration_path}"))
+  end
+
   it "signs in a valid user" do
     user = create(:user, email: "login@resolve.ai")
 
