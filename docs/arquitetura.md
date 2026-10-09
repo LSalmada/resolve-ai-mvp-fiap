@@ -88,7 +88,7 @@ flowchart TB
 | `requester` | Solicitante | Cadastro público (tela `GET /users/sign_up`, envio `POST /users`) sempre força esse papel |
 | `manager` | Gestor | Seed (`manager@resolve.ai`) ou console |
 
-## Enums (código / enunciado)
+## Enums (código / interface)
 
 O domínio usa chaves em inglês no banco; a UI pt-BR traduz.
 

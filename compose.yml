@@ -27,8 +27,12 @@ services:
     environment:
       RAILS_ENV: production
       DATABASE_URL: postgres://postgres:postgres@db:5432/resolve_ai_mvp_fiap_production
+      CACHE_DATABASE_URL: postgres://postgres:postgres@db:5432/resolve_ai_mvp_fiap_production_cache
+      QUEUE_DATABASE_URL: postgres://postgres:postgres@db:5432/resolve_ai_mvp_fiap_production_queue
+      CABLE_DATABASE_URL: postgres://postgres:postgres@db:5432/resolve_ai_mvp_fiap_production_cable
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-local-compose-only-not-for-real-deploys-0123456789abcdef0123456789abcdef}
+      SOLID_QUEUE_IN_PUMA: "true"
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
-      RESOLVE_AI_MVP_FIAP_DATABASE_PASSWORD: postgres
     volumes:
       - app_storage:/rails/storage
 
