@@ -1,0 +1,32 @@
+app = "resolve-ai-mvp-fiap"
+primary_region = "gru"
+console_command = "/rails/bin/rails console"
+
+[build]
+
+[env]
+  HTTP_PORT = "8080"
+  RAILS_LOG_LEVEL = "info"
+  SOLID_QUEUE_IN_PUMA = "true"
+
+[[mounts]]
+  source = "storage"
+  destination = "/rails/storage"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "30s"
+    method = "GET"
+    path = "/up"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
