@@ -4,20 +4,23 @@ class Components::FlashAlerts < Components::Base
   include Phlex::Rails::Helpers::Flash
 
   def view_template
-    flash.each do |type, message|
-      next if message.blank?
+    messages = flash.to_h.reject { |_type, message| message.blank? }
+    return if messages.empty?
 
-      div(
-        class: "mb-2",
-        data: {
-          controller: "flash",
-          flash_delay_value: 4000,
-          turbo_temporary: true
-        }
-      ) do
-        Alert(variant: flash_variant(type)) do
-          AlertTitle { flash_title(type) }
-          AlertDescription { message }
+    div(class: "pointer-events-none fixed inset-x-4 top-4 z-50 flex flex-col gap-2 sm:left-auto sm:w-96") do
+      messages.each do |type, message|
+        div(
+          class: "pointer-events-auto rounded-lg bg-background shadow-lg",
+          data: {
+            controller: "flash",
+            flash_delay_value: 4000,
+            turbo_temporary: true
+          }
+        ) do
+          Alert(variant: flash_variant(type)) do
+            AlertTitle { flash_title(type) }
+            AlertDescription { message }
+          end
         end
       end
     end

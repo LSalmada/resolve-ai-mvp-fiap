@@ -49,7 +49,9 @@ RSpec.describe Occurrence do
           place_in_status!(occurrence, from_status)
 
           expect(occurrence.update(status: to_status, resolution_notes: "x")).to be(false)
-          expect(occurrence.errors[:status]).to include("invalid transition from #{from_status} to #{to_status}")
+          expect(occurrence.errors.added?(:status, :invalid_transition,
+            from: I18n.t("occurrences.statuses.#{from_status}"),
+            to: I18n.t("occurrences.statuses.#{to_status}"))).to be(true)
         end
       end
     end
@@ -72,14 +74,14 @@ RSpec.describe Occurrence do
       occurrence = build(:occurrence, reporter: manager)
 
       expect(occurrence).not_to be_valid
-      expect(occurrence.errors[:reporter]).to include("must be a requester")
+      expect(occurrence.errors[:reporter]).to include("deve ser um solicitante")
     end
 
     it "rejects a requester as assignee" do
       occurrence = build(:occurrence, reporter: requester, assignee: requester)
 
       expect(occurrence).not_to be_valid
-      expect(occurrence.errors[:assignee]).to include("must be a manager")
+      expect(occurrence.errors[:assignee]).to include("deve ser um gestor")
     end
   end
 

@@ -46,7 +46,7 @@ class Occurrence < ApplicationRecord
   validates :title, presence: true, length: { maximum: 160 }
   validates :description, presence: true
   validates :location, presence: true, length: { maximum: 255 }
-  validates :rating, numericality: { only_integer: true, in: 1..5 }, allow_nil: true
+  validates :rating, numericality: { only_integer: true, in: 1..5, message: :out_of_range }, allow_nil: true
   validate :reporter_must_be_requester
   validate :assignee_must_be_manager
   validate :starts_as_open, on: :create
@@ -74,19 +74,19 @@ class Occurrence < ApplicationRecord
   def reporter_must_be_requester
     return if reporter.blank?
 
-    errors.add(:reporter, "must be a requester") unless reporter.requester?
+    errors.add(:reporter, :must_be_requester) unless reporter.requester?
   end
 
   def assignee_must_be_manager
     return if assignee.blank?
 
-    errors.add(:assignee, "must be a manager") unless assignee.manager?
+    errors.add(:assignee, :must_be_manager) unless assignee.manager?
   end
 
   def starts_as_open
     return if open?
 
-    errors.add(:status, "must start as open")
+    errors.add(:status, :must_start_open)
   end
 
   def allowed_status_transition
@@ -96,32 +96,37 @@ class Occurrence < ApplicationRecord
     to_status = status
     return if from_status.blank? || can_transition_to?(to_status, from: from_status)
 
-    errors.add(:status, "invalid transition from #{from_status} to #{to_status}")
+    errors.add(
+      :status,
+      :invalid_transition,
+      from: I18n.t("occurrences.statuses.#{from_status}"),
+      to: I18n.t("occurrences.statuses.#{to_status}")
+    )
   end
 
   def rating_only_when_resolved
     return if rating.blank? && rating_comment.blank?
     return if resolved?
 
-    errors.add(:rating, "can only be filled when the occurrence is resolved")
+    errors.add(:rating, :only_when_resolved)
   end
 
   def resolution_notes_when_resolved
     return unless resolved?
     return if resolution_notes.present?
 
-    errors.add(:resolution_notes, "is required when resolving")
+    errors.add(:resolution_notes, :required_when_resolving)
   end
 
   def acceptable_photo
     return unless photo.attached?
 
     unless photo.content_type.in?(%w[image/jpeg image/png image/webp])
-      errors.add(:photo, "must be JPEG, PNG or WebP")
+      errors.add(:photo, :invalid_content_type)
     end
 
     return unless photo.byte_size > 5.megabytes
 
-    errors.add(:photo, "is too large (maximum 5 MB)")
+    errors.add(:photo, :too_large)
   end
 end

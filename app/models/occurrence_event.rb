@@ -18,6 +18,6 @@ class OccurrenceEvent < ApplicationRecord
   def status_payload_present
     return if from_status.present? && to_status.present?
 
-    errors.add(:to_status, "and from_status are required for status change")
+    errors.add(:to_status, :status_payload_required)
   end
 end

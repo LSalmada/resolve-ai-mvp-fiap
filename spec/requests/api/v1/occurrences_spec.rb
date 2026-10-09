@@ -144,7 +144,22 @@ RSpec.describe "API v1 occurrences", type: :request do
     }, as: :json
 
     expect(response).to have_http_status(:unprocessable_entity)
+    expect(json_body["error"]).to eq("Status não pode mudar de Aberta para Resolvida")
     expect(mine.reload).to be_open
+  end
+
+  it "requires resolution notes when resolving, with a pt-BR message" do
+    advance_status!(mine, actor: manager, to_status: "in_analysis")
+    advance_status!(mine, actor: manager, to_status: "in_progress")
+    api_sign_in manager
+
+    patch api_v1_occurrence_path(mine), params: {
+      occurrence: { status: "resolved", note: "Concluído" }
+    }, as: :json
+
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(json_body["error"]).to eq("Solução aplicada é obrigatória ao marcar como resolvida")
+    expect(mine.reload).to be_in_progress
   end
 
   it "rejects rating before the occurrence is resolved" do
